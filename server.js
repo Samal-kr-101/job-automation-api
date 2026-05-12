@@ -6,11 +6,11 @@ dotenv.config();
 
 const app = express();
 
-// ✅ middleware
+// middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔍 extract email safely
+// extract email safely
 function extractEmail(text = "") {
     const match = text.match(
         /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/
@@ -18,7 +18,7 @@ function extractEmail(text = "") {
     return match ? match[0] : null;
 }
 
-// ✉️ email template
+// email template
 function createEmail() {
     return `
 Hi,
@@ -37,10 +37,10 @@ Candidate
 `;
 }
 
-// 📧 gmail sender
+// gmail sender
 async function sendMail(toEmail, subject, text) {
 
-    console.log("📤 Preparing to send email to:", toEmail);
+    console.log("Preparing to send email to:", toEmail);
 
     const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -50,7 +50,7 @@ async function sendMail(toEmail, subject, text) {
         }
     });
 
-    // 🔥 verify connection (important debug step)
+    // verify connection 
     await transporter.verify();
 
     const mailOptions = {
@@ -69,7 +69,7 @@ async function sendMail(toEmail, subject, text) {
     return transporter.sendMail(mailOptions);
 }
 
-// 🚀 MAIN API
+// MAIN API
 app.post("/apply", async (req, res) => {
     try {
 
@@ -79,31 +79,31 @@ app.post("/apply", async (req, res) => {
         const jobText = req.body?.jobText;
 
         if (!jobText) {
-            return res.status(400).send("❌ jobText missing in request body");
+            return res.status(400).send("jobText missing in request body");
         }
 
         console.log("Received jobText:", jobText);
 
-        // STEP 1: extract email
+        // extract email
         const email = extractEmail(jobText);
 
         if (!email) {
-            return res.status(400).send("❌ No recruiter email found in jobText");
+            return res.status(400).send("No recruiter email found in jobText");
         }
 
         console.log("Extracted email:", email);
 
-        // STEP 2: create message
+        // create message
         const message = createEmail();
 
-        // STEP 3: send email
+        //send email
         await sendMail(
             email,
             "Job Application - Java Developer",
             message
         );
 
-        console.log("✅ Email sent successfully");
+        console.log("Email sent successfully");
 
         res.send({
             status: "success",
@@ -112,7 +112,7 @@ app.post("/apply", async (req, res) => {
         });
 
     } catch (err) {
-        console.log("❌ ERROR:", err.message);
+        console.log("ERROR:", err.message);
         res.status(500).send({
             status: "error",
             message: err.message
@@ -122,5 +122,5 @@ app.post("/apply", async (req, res) => {
 
 // start server
 app.listen(5000, () => {
-    console.log("🚀 Server running on port 5000");
+    console.log("Server running on port 5000");
 });
